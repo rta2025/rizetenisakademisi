@@ -223,7 +223,55 @@ footer{background:var(--ink);padding:44px 60px 28px;border-top:1px solid rgba(25
 .reveal{opacity:0;transform:translateY(22px);transition:opacity 0.6s ease,transform 0.6s ease;}
 .reveal.visible{opacity:1;transform:translateY(0);}
 .r2{transition-delay:0.12s;}.r3{transition-delay:0.22s;}
+
+/* ═══ GALERİ ═══ */
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:30px;}
+.gallery-thumb{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.03);cursor:pointer;}
+.gallery-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.4s ease;}
+.gallery-thumb:hover img{transform:scale(1.06);}
+.gallery-thumb .gdel{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,0.65);color:#fff;border:none;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;}
+.gallery-thumb:hover .gdel{opacity:1;}
+.gallery-empty{text-align:center;padding:60px 0;color:var(--muted);font-style:italic;font-size:0.88rem;}
+.gallery-add-bar{display:flex;align-items:center;gap:12px;margin-top:24px;}
+.gallery-upload-status{font-size:0.78rem;color:var(--muted);}
+
+/* Lightbox */
+.lightbox{position:fixed;inset:0;background:rgba(5,12,5,0.95);z-index:2000;display:none;align-items:center;justify-content:center;padding:40px;}
+.lightbox.open{display:flex;}
+.lightbox img{max-width:90vw;max-height:85vh;border-radius:6px;}
+.lightbox-close{position:absolute;top:24px;right:32px;color:#fff;font-size:1.8rem;cursor:pointer;background:none;border:none;}
+
+/* Gizli yönetici girişi - footer köşesi */
+.admin-trigger{position:fixed;bottom:14px;left:14px;width:18px;height:18px;opacity:0.12;cursor:pointer;z-index:400;transition:opacity 0.2s;color:#fff;}
+.admin-trigger:hover{opacity:0.5;}
+.admin-trigger svg{width:100%;height:100%;}
+
+/* Login overlay */
+.login-overlay{position:fixed;inset:0;background:rgba(5,12,5,0.92);backdrop-filter:blur(6px);z-index:3000;display:none;align-items:center;justify-content:center;}
+.login-overlay.open{display:flex;}
+.login-box{background:#101a10;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:36px;width:340px;max-width:90vw;position:relative;}
+.login-box h3{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#fff;margin-bottom:20px;}
+.login-box input{width:100%;padding:11px 14px;margin-bottom:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:7px;color:#fff;font-family:'Inter',sans-serif;font-size:0.88rem;}
+.login-box input:focus{outline:none;border-color:var(--green-light);}
+.login-box .lbtn{width:100%;padding:11px;border-radius:7px;background:var(--green-light);color:#0b0e0b;border:none;font-weight:700;cursor:pointer;font-size:0.85rem;}
+.login-box .lerr{color:#ff6b6b;font-size:0.78rem;margin-bottom:10px;display:none;}
+.login-box .lclose{position:absolute;top:14px;right:18px;color:rgba(255,255,255,0.4);cursor:pointer;font-size:1.2rem;background:none;border:none;}
+.admin-bar{display:flex;align-items:center;gap:10px;margin-top:24px;padding:10px 16px;background:rgba(78,203,95,0.08);border:1px solid rgba(78,203,95,0.2);border-radius:8px;font-size:0.8rem;color:var(--green-light);}
+.admin-bar button{margin-left:auto;background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:0.75rem;}
 </style>
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL  = "https://owbwkkptimsibwabuozc.supabase.co";
+  const SUPABASE_ANON = "sb_publishable_JNAjF1j0CUZRnSL4tUQAeA_yVw1Ug8M";
+  window._sbReady = false;
+  try {
+    const { createClient } = supabase;
+    window._sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+    window._sbReady = true;
+  } catch(e) { console.warn('Supabase başlatılamadı:', e); }
+</script>
 </head>
 <body>
 
@@ -258,6 +306,7 @@ footer{background:var(--ink);padding:44px 60px 28px;border-top:1px solid rgba(25
       </div>
     </li>
     <li class="nav-item"><span class="nav-link" onclick="showPage('tesis')">Tesisimiz</span></li>
+    <li class="nav-item"><span class="nav-link" onclick="showPage('galeri')">Galeri</span></li>
     <li class="nav-item"><span class="nav-link" onclick="showPage('egitmenler')">Eğitmenler</span></li>
     <li class="nav-item"><span class="nav-link" onclick="showPage('iletisim')">İletişim</span></li>
     <li><div class="nav-divider"></div></li>
@@ -272,7 +321,7 @@ footer{background:var(--ink);padding:44px 60px 28px;border-top:1px solid rgba(25
   <div class="mob-group"><div class="mob-group-title">Kulübümüz</div><span class="mob-link" onclick="showPage('biz-kimiz');toggleMobile()">Hakkımızda</span><span class="mob-link" onclick="showPage('tarihce');toggleMobile()">Tarihçe</span><span class="mob-link" onclick="showPage('vizyon');toggleMobile()">Vizyon &amp; Misyon</span>
     <span class="mob-link" onclick="showPage('yonetim-kurulu');toggleMobile()">Yönetim Kurulu</span></div>
   <div class="mob-group"><div class="mob-group-title">Programlar</div><span class="mob-link" onclick="showPage('prog-cocuk');toggleMobile()">Çocuk Tenis Okulu</span><span class="mob-link" onclick="showPage('prog-yetiskin');toggleMobile()">Yetişkin Programları</span><span class="mob-link" onclick="showPage('prog-ozel');toggleMobile()">Özel Dersler</span><span class="mob-link" onclick="showPage('prog-performans');toggleMobile()">Performans Tenisi</span></div>
-  <div class="mob-group"><div class="mob-group-title">Diğer</div><span class="mob-link" onclick="showPage('tesis');toggleMobile()">Tesisimiz</span><span class="mob-link" onclick="showPage('egitmenler');toggleMobile()">Eğitmenler</span><span class="mob-link" onclick="showPage('iletisim');toggleMobile()">İletişim</span></div>
+  <div class="mob-group"><div class="mob-group-title">Diğer</div><span class="mob-link" onclick="showPage('tesis');toggleMobile()">Tesisimiz</span><span class="mob-link" onclick="showPage('galeri');toggleMobile()">Galeri</span><span class="mob-link" onclick="showPage('egitmenler');toggleMobile()">Eğitmenler</span><span class="mob-link" onclick="showPage('iletisim');toggleMobile()">İletişim</span></div>
   <span class="mob-lig" onclick="window.location.href='lig.html'">🏆 RTA Ligi →</span>
 </div>
 
@@ -611,6 +660,51 @@ footer{background:var(--ink);padding:44px 60px 28px;border-top:1px solid rgba(25
 </div>
 
 <!-- EĞİTMENLER -->
+<!-- GALERİ -->
+<div class="page" id="page-galeri">
+  <div class="page-hero"><div class="page-hero-inner"><span class="page-hero-eyebrow">Kareler</span><h1 class="page-hero-title">Foto<em>Galeri</em></h1><div class="breadcrumb"><span class="breadcrumb-link" onclick="showPage('home')">Ana Sayfa</span><span class="breadcrumb-sep">›</span><span class="breadcrumb-cur">Galeri</span></div></div></div>
+  <div class="content-section">
+    <span class="eyebrow reveal">Topluluğumuz</span><h2 class="heading reveal r2">Akademiden <em>Kareler</em></h2><div class="divider reveal r2"></div>
+
+    <div id="admin-bar-galeri" class="admin-bar" style="display:none">
+      <span>🔐 Yönetici modundasınız</span>
+      <button onclick="adminLogout()">Çıkış</button>
+    </div>
+    <div id="admin-add-galeri" class="gallery-add-bar" style="display:none">
+      <input type="file" id="akademi-photo-file" accept="image/*" style="display:none" onchange="addAkademiPhoto(this)">
+      <button class="btn-fill" style="cursor:pointer" onclick="document.getElementById('akademi-photo-file').click()">📷 Fotoğraf Ekle</button>
+      <span id="akademi-upload-status" class="gallery-upload-status"></span>
+    </div>
+
+    <div id="akademi-gallery-grid" class="gallery-grid"></div>
+    <div id="akademi-gallery-empty" class="gallery-empty" style="display:none">Henüz fotoğraf eklenmemiş.</div>
+  </div>
+  <footer><div class="footer-top"><div class="footer-logo"><img src="" class="rta-logo-img" alt="RTA"><div><div class="footer-brand-name">Rize Tenis Akademisi</div></div></div></div><div class="footer-bottom"><span class="footer-copy">© 2025 RTA.</span><span class="footer-lig-link" onclick="window.location.href='lig.html'">🏆 RTA Ligi →</span></div></footer>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <button class="lightbox-close" onclick="closeLightbox(event)">✕</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<!-- Gizli yönetici giriş tetikleyici -->
+<div class="admin-trigger" onclick="openAdminLogin()" title="">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+</div>
+
+<!-- Login overlay -->
+<div class="login-overlay" id="login-overlay">
+  <div class="login-box">
+    <button class="lclose" onclick="closeAdminLogin()">✕</button>
+    <h3>Yönetici Girişi</h3>
+    <div class="lerr" id="login-error">Hatalı e-posta veya şifre.</div>
+    <input type="email" id="login-email" placeholder="E-posta">
+    <input type="password" id="login-pw" placeholder="Şifre">
+    <button class="lbtn" onclick="doAdminLogin()">Giriş Yap</button>
+  </div>
+</div>
+
 <div class="page" id="page-egitmenler">
   <div class="page-hero"><div class="page-hero-inner"><span class="page-hero-eyebrow">Kadromuz</span><h1 class="page-hero-title">Eğitmen<em>lerimiz</em></h1><div class="breadcrumb"><span class="breadcrumb-link" onclick="showPage('home')">Ana Sayfa</span><span class="breadcrumb-sep">›</span><span class="breadcrumb-cur">Eğitmenler</span></div></div></div>
   <div class="content-section"><div class="coming-box reveal"><div class="coming-tag">Çok Yakında</div><div class="coming-title">Eğitmen Kadromuz</div><p class="coming-desc">Uzman eğitmenlerimiz yakında burada olacak.</p></div></div>
@@ -722,6 +816,151 @@ const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
 }, {threshold: 0.1});
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+<script>
+// ═══ YÖNETİCİ GİRİŞİ (gizli) ═══
+let _adminSession = null;
+function isAdminLoggedIn() { return !!_adminSession; }
+
+function setAdminUI(loggedIn) {
+  document.getElementById('admin-bar-galeri').style.display = loggedIn ? 'flex' : 'none';
+  document.getElementById('admin-add-galeri').style.display = loggedIn ? 'flex' : 'none';
+  renderAkademiGallery();
+}
+
+function openAdminLogin() {
+  document.getElementById('login-overlay').classList.add('open');
+  document.getElementById('login-error').style.display = 'none';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pw').value = '';
+}
+function closeAdminLogin() {
+  document.getElementById('login-overlay').classList.remove('open');
+}
+
+async function doAdminLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-pw').value;
+  const errEl = document.getElementById('login-error');
+  if (!email || !pw) { errEl.textContent = 'E-posta ve şifre gerekli.'; errEl.style.display = 'block'; return; }
+  if (!window._sbReady) { errEl.textContent = 'Bağlantı hatası, sayfayı yenileyin.'; errEl.style.display = 'block'; return; }
+
+  const { data, error } = await window._sb.auth.signInWithPassword({ email, password: pw });
+  if (error || !data.session) {
+    errEl.textContent = 'Hatalı e-posta veya şifre.';
+    errEl.style.display = 'block';
+    return;
+  }
+  _adminSession = data.session;
+  closeAdminLogin();
+  setAdminUI(true);
+}
+
+async function adminLogout() {
+  try { await window._sb.auth.signOut(); } catch(e) {}
+  _adminSession = null;
+  setAdminUI(false);
+}
+
+// Sayfa açılışında oturumu geri yükle
+window.addEventListener('load', () => {
+  if (!window._sbReady) return;
+  window._sb.auth.getSession().then(({ data }) => {
+    _adminSession = data.session || null;
+    setAdminUI(isAdminLoggedIn());
+  });
+  window._sb.auth.onAuthStateChange((_e, session) => {
+    _adminSession = session || null;
+    setAdminUI(isAdminLoggedIn());
+  });
+});
+
+// ═══ CLOUDINARY YÜKLEME ═══
+const CLOUDINARY_CLOUD = 'dqvvllly7';
+const CLOUDINARY_PRESET = 'rtaupload';
+
+async function uploadToCloudinary(file, statusElId) {
+  const statusEl = statusElId ? document.getElementById(statusElId) : null;
+  if (statusEl) statusEl.textContent = '⏳ Yükleniyor...';
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_PRESET);
+  try {
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method: 'POST', body: formData });
+    const data = await res.json();
+    if (statusEl) statusEl.textContent = '';
+    if (data.secure_url) return data.secure_url;
+    throw new Error((data.error && data.error.message) || 'Yükleme başarısız');
+  } catch(e) {
+    if (statusEl) statusEl.textContent = '';
+    alert('❌ Yükleme hatası: ' + e.message);
+    return null;
+  }
+}
+
+// ═══ GALERİ (Supabase: akademi_photos) ═══
+let _akademiPhotos = [];
+
+async function loadAkademiGallery() {
+  if (!window._sbReady) return;
+  try {
+    const { data, error } = await window._sb.from('akademi_photos').select('*').order('created_at', { ascending: false });
+    if (!error && data) _akademiPhotos = data;
+  } catch(e) { console.warn(e); }
+  renderAkademiGallery();
+}
+
+function renderAkademiGallery() {
+  const grid = document.getElementById('akademi-gallery-grid');
+  const empty = document.getElementById('akademi-gallery-empty');
+  if (!grid) return;
+  if (!_akademiPhotos.length) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.innerHTML = _akademiPhotos.map(p => `
+    <div class="gallery-thumb" onclick="openLightbox('${p.url}')">
+      <img src="${p.url}" loading="lazy" alt="">
+      ${isAdminLoggedIn() ? `<button class="gdel" onclick="event.stopPropagation();deleteAkademiPhoto(${p.id})">✕</button>` : ''}
+    </div>`).join('');
+}
+
+async function addAkademiPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const url = await uploadToCloudinary(file, 'akademi-upload-status');
+  input.value = '';
+  if (!url) return;
+  try {
+    const { data, error } = await window._sb.from('akademi_photos').insert({ url }).select();
+    if (!error && data) _akademiPhotos.unshift(data[0]);
+    renderAkademiGallery();
+  } catch(e) { alert('Kayıt hatası: ' + e.message); }
+}
+
+async function deleteAkademiPhoto(id) {
+  if (!confirm('Bu fotoğraf silinsin mi?')) return;
+  try {
+    await window._sb.from('akademi_photos').delete().eq('id', id);
+    _akademiPhotos = _akademiPhotos.filter(p => p.id !== id);
+    renderAkademiGallery();
+  } catch(e) { alert('Silme hatası: ' + e.message); }
+}
+
+function openLightbox(url) {
+  document.getElementById('lightbox-img').src = url;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox(e) {
+  if (e.target.closest('.lightbox-close') || e.target.id === 'lightbox') {
+    document.getElementById('lightbox').classList.remove('open');
+  }
+}
+
+loadAkademiGallery();
 </script>
 
 <script>
