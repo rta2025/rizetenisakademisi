@@ -240,6 +240,12 @@ footer{background:var(--ink);padding:44px 60px 28px;border-top:1px solid rgba(25
 .lightbox.open{display:flex;}
 .lightbox img{max-width:90vw;max-height:85vh;border-radius:6px;}
 .lightbox-close{position:absolute;top:24px;right:32px;color:#fff;font-size:1.8rem;cursor:pointer;background:none;border:none;}
+.lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.35);backdrop-filter:blur(8px);color:#fff;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s,border-color 0.2s;}
+.lightbox-nav:hover{background:rgba(78,203,95,0.25);border-color:rgba(78,203,95,0.4);}
+.lightbox-prev{left:24px;}
+.lightbox-next{right:24px;}
+.lightbox-counter{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.45);font-family:'Oswald',sans-serif;font-size:0.78rem;letter-spacing:2px;}
+@media(max-width:768px){.lightbox-nav{width:40px;height:40px;font-size:1.1rem;}.lightbox-prev{left:10px;}.lightbox-next{right:10px;}}
 
 /* Gizli yönetici girişi - footer köşesi */
 .admin-trigger{position:fixed;bottom:14px;left:14px;width:18px;height:18px;opacity:0.12;cursor:pointer;z-index:400;transition:opacity 0.2s;color:#fff;}
@@ -305,7 +311,6 @@ footer{background:var(--ink);padding:44px 60px 28px;border-top:1px solid rgba(25
         <span class="dropdown-item" onclick="showPage('prog-performans')">Performans Tenisi</span>
       </div>
     </li>
-    <li class="nav-item"><span class="nav-link" onclick="showPage('tesis')">Tesisimiz</span></li>
     <li class="nav-item"><span class="nav-link" onclick="showPage('galeri')">Galeri</span></li>
     <li class="nav-item"><span class="nav-link" onclick="showPage('egitmenler')">Eğitmenler</span></li>
     <li class="nav-item"><span class="nav-link" onclick="showPage('iletisim')">İletişim</span></li>
@@ -321,7 +326,7 @@ footer{background:var(--ink);padding:44px 60px 28px;border-top:1px solid rgba(25
   <div class="mob-group"><div class="mob-group-title">Kulübümüz</div><span class="mob-link" onclick="showPage('biz-kimiz');toggleMobile()">Hakkımızda</span><span class="mob-link" onclick="showPage('tarihce');toggleMobile()">Tarihçe</span><span class="mob-link" onclick="showPage('vizyon');toggleMobile()">Vizyon &amp; Misyon</span>
     <span class="mob-link" onclick="showPage('yonetim-kurulu');toggleMobile()">Yönetim Kurulu</span></div>
   <div class="mob-group"><div class="mob-group-title">Programlar</div><span class="mob-link" onclick="showPage('prog-cocuk');toggleMobile()">Çocuk Tenis Okulu</span><span class="mob-link" onclick="showPage('prog-yetiskin');toggleMobile()">Yetişkin Programları</span><span class="mob-link" onclick="showPage('prog-ozel');toggleMobile()">Özel Dersler</span><span class="mob-link" onclick="showPage('prog-performans');toggleMobile()">Performans Tenisi</span></div>
-  <div class="mob-group"><div class="mob-group-title">Diğer</div><span class="mob-link" onclick="showPage('tesis');toggleMobile()">Tesisimiz</span><span class="mob-link" onclick="showPage('galeri');toggleMobile()">Galeri</span><span class="mob-link" onclick="showPage('egitmenler');toggleMobile()">Eğitmenler</span><span class="mob-link" onclick="showPage('iletisim');toggleMobile()">İletişim</span></div>
+  <div class="mob-group"><div class="mob-group-title">Diğer</div><span class="mob-link" onclick="showPage('galeri');toggleMobile()">Galeri</span><span class="mob-link" onclick="showPage('egitmenler');toggleMobile()">Eğitmenler</span><span class="mob-link" onclick="showPage('iletisim');toggleMobile()">İletişim</span></div>
   <span class="mob-lig" onclick="window.location.href='lig.html'">🏆 RTA Ligi →</span>
 </div>
 
@@ -460,7 +465,7 @@ footer{background:var(--ink);padding:44px 60px 28px;border-top:1px solid rgba(25
         <div class="tl-dot"></div>
         <div class="tl-body">
           <div class="tl-title">Akademinin Kuruluşu</div>
-          <div class="tl-desc">Rize Tenis Akademisi, İslampaşa Sahil'deki tesiste 3 kapalı kortla hizmete açıldı. Kulübün kurucu üyeleri bir araya gelerek Rize'de profesyonel tenis kültürünü başlattı.</div>
+          <div class="tl-desc">Rize Tenis Akademisi'nin temelleri, kurucu üyelerin Boston Cafe'de bir araya gelmesiyle atıldı. O dönemde Rize'de düzenli bir tenis ligi ve oyuncuları bir araya getiren sürdürülebilir bir yapı bulunmuyordu. Kulübümüz, tenis sporuna ilgi duyan insanları ortak bir çatı altında buluşturmak, düzenli organizasyonlar oluşturmak ve Rize'de tenis kültürünü geliştirmek amacıyla yola çıktı. Akademi sporcuları ise çalışmalarını İslampaşa Sahili'ndeki Gençlik ve Spor tenis kortlarında sürdürmeye başladı.</div>
         </div>
       </div>
       <div class="tl-item">
@@ -468,7 +473,7 @@ footer{background:var(--ink);padding:44px 60px 28px;border-top:1px solid rgba(25
         <div class="tl-dot"></div>
         <div class="tl-body">
           <div class="tl-title">🏆 Rize Cup 1 — İlk Takım Turnuvası</div>
-          <div class="tl-desc">Akademimizin ilk organizasyonu olan Rize Cup 1, 15 Ekim'de kura çekimiyle başladı. 24 sporcu, 8 takım hâlinde mücadele etti. 29 Kasım'daki final maçlarının ardından <strong>B Takımı</strong> (Ramazan Demirci, Göksenin Yıldırım, Ensar Özer) şampiyon oldu. 1 Aralık'ta düzenlenen kupa töreni, horon eşliğinde kutlamalarla tarihe geçti.</div>
+          <div class="tl-desc">Akademimizin ilk organizasyonu olan Rize Cup 1, 15 Ekim'de yapılan kura çekimiyle başladı. 24 sporcu, 8 takım hâlinde mücadele etti. 29 Kasım'daki final maçlarının ardından <strong>B Takımı</strong> (Ramazan Demirci, Göksenin Yıldırım, Ensar Özer) şampiyon oldu. 1 Aralık'ta düzenlenen kupa töreniyle Rize Cup 1, akademi tarihindeki ilk takım turnuvası olarak yerini aldı.</div>
         </div>
       </div>
       <div class="tl-item">
@@ -484,7 +489,7 @@ footer{background:var(--ink);padding:44px 60px 28px;border-top:1px solid rgba(25
         <div class="tl-dot"></div>
         <div class="tl-body">
           <div class="tl-title">🏆 Rize Cup 2 — Ramazan Turnuvası</div>
-          <div class="tl-desc">9 Şubat'ta başlayan turnuvada 12 takım ve 36 sporcu mücadele etti. Karşılaşmalar Ramazan ayında, iftar sonrasında oynandı. 17-18 Mart finallerinde <strong>E Takımı</strong> (Ramazan Demirci, İlker Yasin Memişoğlu, Eray Gürsoy), L Takımı'nı 6-2, 6-3 yenerek şampiyon oldu. Final maçı YouTube'da canlı yayımlandı.</div>
+          <div class="tl-desc">9 Şubat'ta başlayan turnuvada 12 takım ve 36 sporcu mücadele etti. 17-18 Mart finallerinde <strong>E Takımı</strong> (Ramazan Demirci, İlker Yasin Memişoğlu, Eray Gürsoy), L Takımı'nı 6-2, 6-3 yenerek şampiyon oldu. Final maçı YouTube'da canlı yayımlandı.</div>
         </div>
       </div>
       <div class="tl-item">
@@ -610,8 +615,8 @@ footer{background:var(--ink);padding:44px 60px 28px;border-top:1px solid rgba(25
   <div class="page-hero"><div class="page-hero-inner"><span class="page-hero-eyebrow">Hakkımızda</span><h1 class="page-hero-title">Vizyon &amp; <em>Misyon</em></h1><div class="breadcrumb"><span class="breadcrumb-link" onclick="showPage('home')">Ana Sayfa</span><span class="breadcrumb-sep">›</span><span class="breadcrumb-cur">Vizyon &amp; Misyon</span></div></div></div>
   <div class="content-section">
     <div class="vm-grid reveal">
-      <div class="vm-card"><span class="vm-card-icon">🔭</span><div class="vm-card-title">Vizyonumuz</div><p class="vm-card-text">Karadeniz bölgesinin tenis merkezi olmak; Rize'den yetişen sporcuları ulusal ve uluslararası arenada temsil edecek düzeye taşımak.</p></div>
-      <div class="vm-card"><span class="vm-card-icon">🎯</span><div class="vm-card-title">Misyonumuz</div><p class="vm-card-text">Her yaştan ve seviyeden bireye erişilebilir, kaliteli tenis eğitimi sunmak; Rize'de sağlıklı yaşam kültürüne katkıda bulunmak.</p></div>
+      <div class="vm-card"><span class="vm-card-icon">🔭</span><div class="vm-card-title">Vizyonumuz</div><p class="vm-card-text">Rize'yi Karadeniz'in tenis alanındaki öncü şehirlerinden biri hâline getirmek; altyapıdan yetişen sporcularımızı disiplinli, özgüvenli ve rekabetçi bireyler olarak ulusal ve uluslararası arenada temsil edecek seviyeye taşımak. Tenisi yalnızca bir spor dalı olarak değil, gençlere hedef koyma, mücadele etme ve birlikte gelişme kültürü kazandıran kalıcı bir değer hâline getirmek.</p></div>
+      <div class="vm-card"><span class="vm-card-icon">🎯</span><div class="vm-card-title">Misyonumuz</div><p class="vm-card-text">Tenisi Rize'de daha erişilebilir, düzenli ve sürdürülebilir bir spor kültürüne dönüştürmek; her yaştan ve seviyeden sporcuyu kaliteli eğitim, güçlü organizasyonlar ve birlik duygusu etrafında buluşturmak. Sporcularımızın teknik gelişimlerinin yanı sıra karakter, disiplin, fair-play ve takım ruhu açısından da güçlenmelerine katkı sağlamak.</p></div>
     </div>
     <div class="vm-values reveal r2">
       <div class="vm-value"><div class="vm-dot"></div><div class="vm-text">Profesyonellik ve kalite</div></div>
@@ -645,20 +650,6 @@ footer{background:var(--ink);padding:44px 60px 28px;border-top:1px solid rgba(25
 </div>
 
 <!-- TESİSİMİZ -->
-<div class="page" id="page-tesis">
-  <div class="page-hero"><div class="page-hero-inner"><span class="page-hero-eyebrow">Altyapı</span><h1 class="page-hero-title">Tesisi<em>miz</em></h1><div class="breadcrumb"><span class="breadcrumb-link" onclick="showPage('home')">Ana Sayfa</span><span class="breadcrumb-sep">›</span><span class="breadcrumb-cur">Tesisimiz</span></div></div></div>
-  <div class="content-section">
-    <span class="eyebrow reveal">Altyapı</span><h2 class="heading reveal r2">Modern Tesis, <em>Merkezi Konum</em></h2><div class="divider reveal r2"></div>
-    <p class="body-text reveal r3" style="max-width:580px">Rize Merkez, İslampaşa Sahil'de 3 kapalı kortla hava koşullarından bağımsız, yıl boyunca tenis imkânı sunuyoruz.</p>
-    <div class="tesis-grid reveal r2">
-      <div class="tesis-card"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="3" x2="12" y2="21"/></svg><div class="tesis-card-title">3 Kapalı Kort</div><div class="tesis-card-desc">Modern, standart ölçülerde kapalı kortlar. Her mevsim kullanılabilir.</div></div>
-      <div class="tesis-card"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><div class="tesis-card-title">İslampaşa Sahil</div><div class="tesis-card-desc">Rize Merkez'de sahil boyunda, ulaşımı kolay merkezi konum.</div></div>
-      <div class="tesis-card"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><div class="tesis-card-title">Yıl Boyunca Açık</div><div class="tesis-card-desc">Sezon sonu yok. 12 ay boyunca antrenman ve maç imkânı.</div></div>
-    </div>
-  </div>
-  <footer><div class="footer-top"><div class="footer-logo"><img src="" class="rta-logo-img" alt="RTA"><div><div class="footer-brand-name">Rize Tenis Akademisi</div><div class="footer-brand-city">Rize, Türkiye</div></div></div></div><div class="footer-bottom"><span class="footer-copy">© 2025 RTA.</span><span class="footer-lig-link" onclick="window.location.href='lig.html'">🏆 RTA Ligi →</span></div></footer>
-</div>
-
 <!-- EĞİTMENLER -->
 <!-- GALERİ -->
 <div class="page" id="page-galeri">
@@ -685,7 +676,10 @@ footer{background:var(--ink);padding:44px 60px 28px;border-top:1px solid rgba(25
 <!-- Lightbox -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
   <button class="lightbox-close" onclick="closeLightbox(event)">✕</button>
+  <button class="lightbox-nav lightbox-prev" onclick="event.stopPropagation();lightboxNav(-1)">‹</button>
   <img id="lightbox-img" src="" alt="">
+  <button class="lightbox-nav lightbox-next" onclick="event.stopPropagation();lightboxNav(1)">›</button>
+  <div class="lightbox-counter" id="lightbox-counter"></div>
 </div>
 
 <!-- Gizli yönetici giriş tetikleyici -->
@@ -925,8 +919,8 @@ function renderAkademiGallery() {
     return;
   }
   empty.style.display = 'none';
-  grid.innerHTML = _akademiPhotos.map(p => `
-    <div class="gallery-thumb" onclick="openLightbox('${p.url}')">
+  grid.innerHTML = _akademiPhotos.map((p, i) => `
+    <div class="gallery-thumb" onclick="openLightbox(${i})">
       <img src="${p.url}" loading="lazy" alt="">
       ${isAdminLoggedIn() ? `<button class="gdel" onclick="event.stopPropagation();deleteAkademiPhoto(${p.id})">✕</button>` : ''}
     </div>`).join('');
@@ -954,15 +948,34 @@ async function deleteAkademiPhoto(id) {
   } catch(e) { alert('Silme hatası: ' + e.message); }
 }
 
-function openLightbox(url) {
-  document.getElementById('lightbox-img').src = url;
+let _lightboxIdx = 0;
+
+function openLightbox(idx) {
+  _lightboxIdx = idx;
+  renderLightboxImg();
   document.getElementById('lightbox').classList.add('open');
+}
+function renderLightboxImg() {
+  const photo = _akademiPhotos[_lightboxIdx];
+  if (!photo) return;
+  document.getElementById('lightbox-img').src = photo.url;
+  document.getElementById('lightbox-counter').textContent = (_lightboxIdx + 1) + ' / ' + _akademiPhotos.length;
+}
+function lightboxNav(dir) {
+  _lightboxIdx = (_lightboxIdx + dir + _akademiPhotos.length) % _akademiPhotos.length;
+  renderLightboxImg();
 }
 function closeLightbox(e) {
   if (e.target.closest('.lightbox-close') || e.target.id === 'lightbox') {
     document.getElementById('lightbox').classList.remove('open');
   }
 }
+document.addEventListener('keydown', (e) => {
+  if (!document.getElementById('lightbox').classList.contains('open')) return;
+  if (e.key === 'ArrowLeft') lightboxNav(-1);
+  if (e.key === 'ArrowRight') lightboxNav(1);
+  if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('open');
+});
 
 loadAkademiGallery();
 </script>
