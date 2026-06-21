@@ -830,6 +830,10 @@ function setAdminUI(loggedIn) {
 }
 
 function openAdminLogin() {
+  if (isAdminLoggedIn()) {
+    if (confirm('Yönetici modundasınız. Çıkış yapmak ister misiniz?')) adminLogout();
+    return;
+  }
   document.getElementById('login-overlay').classList.add('open');
   document.getElementById('login-error').style.display = 'none';
   document.getElementById('login-email').value = '';
