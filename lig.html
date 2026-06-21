@@ -2164,7 +2164,7 @@ body.light-mode .zone-rel td { background: #fae3e3 !important; }
     </div>
     <div id="detail-admin-add" class="admin-only" style="display:none;margin-bottom:16px">
       <div class="gallery-add-row">
-        <input type="file" id="detail-photo-file" accept="image/*" style="display:none" onchange="addPhotoToAlbumFile(this)">
+        <input type="file" id="detail-photo-file" accept="image/*" multiple style="display:none" onchange="addPhotoToAlbumFile(this)">
         <button class="btn btn-green" style="white-space:nowrap" onclick="document.getElementById('detail-photo-file').click()">📷 Fotoğraf Ekle</button>
         <span id="detail-upload-status" style="font-size:0.78rem;color:var(--text-muted)"></span>
       </div>
@@ -3969,7 +3969,7 @@ function renderArchive() {
 
       const addRow = isAdmin ? `
         <div class="gallery-add-row">
-          <input type="file" id="photo-file-${season.id}" accept="image/*" style="display:none" onchange="addPhotoFile(${season.id}, this)">
+          <input type="file" id="photo-file-${season.id}" accept="image/*" multiple style="display:none" onchange="addPhotoFile(${season.id}, this)">
           <button class="btn btn-green" style="white-space:nowrap" onclick="document.getElementById('photo-file-${season.id}').click()">📷 Fotoğraf Ekle</button>
           <span id="upload-status-${season.id}" style="font-size:0.78rem;color:var(--text-muted)"></span>
         </div>` : '';
@@ -4437,19 +4437,25 @@ async function uploadToCloudinary(file, statusElId) {
 }
 
 async function addPhotoFile(seasonId, input) {
-  const file = input.files[0];
-  if (!file) return;
-  const url = await uploadToCloudinary(file, 'upload-status-' + seasonId);
-  input.value = '';
-  if (!url) return;
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  const statusId = 'upload-status-' + seasonId;
+  const statusEl = document.getElementById(statusId);
 
-  const entry = { id: Date.now(), seasonId, url, date: new Date().toISOString().split('T')[0] };
-  const all = loadGallery();
-  all.push(entry);
-  saveGallery(all);
-  sbUpsertPhoto(entry);
+  for (let i = 0; i < files.length; i++) {
+    if (statusEl) statusEl.textContent = `⏳ Yükleniyor (${i+1}/${files.length})...`;
+    const url = await uploadToCloudinary(files[i], null);
+    if (!url) continue;
+    const entry = { id: Date.now() + i, seasonId, url, date: new Date().toISOString().split('T')[0] };
+    const all = loadGallery();
+    all.push(entry);
+    saveGallery(all);
+    sbUpsertPhoto(entry);
+  }
+  if (statusEl) statusEl.textContent = '';
+  input.value = '';
   renderArchive();
-  showToast('✅ Fotoğraf eklendi');
+  showToast('✅ Fotoğraflar eklendi');
 }
 
 async function deletePhoto(id) {
@@ -4542,17 +4548,22 @@ async function deleteAlbum() {
 
 async function addPhotoToAlbumFile(input) {
   if (!isLoggedIn() || !_currentAlbumId) return;
-  const file = input.files[0];
-  if (!file) return;
-  const url = await uploadToCloudinary(file, 'detail-upload-status');
-  input.value = '';
-  if (!url) return;
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  const statusEl = document.getElementById('detail-upload-status');
 
-  const photo = { id: Date.now(), albumId: _currentAlbumId, url, date: new Date().toISOString().split('T')[0] };
-  const all = loadAlbumPhotos(); all.push(photo); saveAlbumPhotos(all);
-  sbUpsertAlbumPhoto(photo);
+  for (let i = 0; i < files.length; i++) {
+    if (statusEl) statusEl.textContent = `⏳ Yükleniyor (${i+1}/${files.length})...`;
+    const url = await uploadToCloudinary(files[i], null);
+    if (!url) continue;
+    const photo = { id: Date.now() + i, albumId: _currentAlbumId, url, date: new Date().toISOString().split('T')[0] };
+    const all = loadAlbumPhotos(); all.push(photo); saveAlbumPhotos(all);
+    sbUpsertAlbumPhoto(photo);
+  }
+  if (statusEl) statusEl.textContent = '';
+  input.value = '';
   renderAlbumDetail(_currentAlbumId);
-  showToast('✅ Fotoğraf eklendi');
+  showToast('✅ Fotoğraflar eklendi');
 }
 
 async function deleteAlbumPhoto(id) {
