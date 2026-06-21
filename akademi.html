@@ -763,6 +763,27 @@ function startAuto() {
 
 startAuto();
 
+// Dokunarak kaydırma (mobil)
+(function() {
+  const sliderEl = document.getElementById('slider');
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  sliderEl.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  sliderEl.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 40) {
+      clearInterval(timer);
+      if (diff > 0) { goSlide(current + 1); } else { goSlide(current - 1); }
+      startAuto();
+    }
+  }, { passive: true });
+})();
+
 // Page navigation
 
 // ═══ SLIDER ═══
@@ -994,7 +1015,7 @@ loadAkademiGallery();
 
 <script>
 (function(){
-  var LOGO="https://res.cloudinary.com/dqvvllly7/image/upload/f_auto,q_auto/logo_xeagyf";
+  var LOGO="https://res.cloudinary.com/dqvvllly7/image/upload/f_png,q_auto/logo_xeagyf";
   document.querySelectorAll('.rta-logo-img').forEach(function(el){el.src=LOGO;});
 })();
 </script>
