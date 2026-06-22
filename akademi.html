@@ -960,7 +960,7 @@ let _currentAlbumId = null;
 let _lightboxPhotos = [];
 
 async function loadAlbums() {
-  if (!window._sbReady) return;
+  if (!window._sbReady) { setTimeout(loadAlbums, 500); return; }
   try {
     const { data: albums } = await window._sb.from('akademi_albums').select('*').order('created_at', { ascending: false });
     if (albums) _albums = albums;
