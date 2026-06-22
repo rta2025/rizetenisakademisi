@@ -671,14 +671,29 @@ footer{background:var(--ink);padding:44px 60px 28px;border-top:1px solid rgba(25
       <span>🔐 Yönetici modundasınız</span>
       <button onclick="adminLogout()">Çıkış</button>
     </div>
-    <div id="admin-add-galeri" class="gallery-add-bar" style="display:none">
-      <input type="file" id="akademi-photo-file" accept="image/*" multiple style="display:none" onchange="addAkademiPhoto(this)">
-      <button class="btn-fill" style="cursor:pointer" onclick="document.getElementById('akademi-photo-file').click()">📷 Fotoğraf Ekle</button>
-      <span id="akademi-upload-status" class="gallery-upload-status"></span>
+
+    <!-- Albüm listesi görünümü -->
+    <div id="galeri-albums-view">
+      <div id="admin-create-album" class="album-create-bar" style="display:none">
+        <input type="text" id="new-album-name" placeholder="Yeni albüm adı (örn: Rize Cup 1)">
+        <button class="btn-fill" onclick="createAlbum()" style="cursor:pointer;white-space:nowrap">+ Albüm Oluştur</button>
+      </div>
+      <div id="album-grid" class="album-grid"></div>
+      <div id="album-grid-empty" class="gallery-empty" style="display:none">Henüz albüm oluşturulmamış.</div>
     </div>
 
-    <div id="akademi-gallery-grid" class="gallery-grid"></div>
-    <div id="akademi-gallery-empty" class="gallery-empty" style="display:none">Henüz fotoğraf eklenmemiş.</div>
+    <!-- Albüm detay görünümü -->
+    <div id="galeri-detail-view" style="display:none">
+      <div class="album-back" onclick="showAlbumList()">← Tüm Albümler</div>
+      <div class="album-detail-title" id="detail-album-name"></div>
+      <div id="admin-add-galeri" class="gallery-add-bar" style="display:none">
+        <input type="file" id="akademi-photo-file" accept="image/*" multiple style="display:none" onchange="addAkademiPhoto(this)">
+        <button class="btn-fill" style="cursor:pointer" onclick="document.getElementById('akademi-photo-file').click()">📷 Fotoğraf Ekle</button>
+        <span id="akademi-upload-status" class="gallery-upload-status"></span>
+      </div>
+      <div id="akademi-gallery-grid" class="gallery-grid"></div>
+      <div id="akademi-gallery-empty" class="gallery-empty" style="display:none">Bu albümde henüz fotoğraf yok.</div>
+    </div>
   </div>
   <footer><div class="footer-top"><div class="footer-logo"><img src="" class="rta-logo-img" alt="RTA"><div><div class="footer-brand-name">Rize Tenis Akademisi</div><div class="footer-brand-city">Rize, Türkiye</div></div></div><a class="footer-insta" href="https://www.instagram.com/rizetenisakademisi" target="_blank"><span class="insta-badge"><img src="" class="insta-icon-img" alt="Instagram"></span>@rizetenisakademisi</a></div><div class="footer-bottom"><span class="footer-copy">© 2025 Rize Tenis Akademisi. Tüm hakları saklıdır.</span><span class="footer-lig-link" onclick="window.location.href='lig.html'">🏆 RTA Ligi →</span></div></footer>
 </div>
@@ -827,8 +842,17 @@ function showPage(id) {
       page.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     }, 50);
     if (id === 'home') startAuto();
+    history.replaceState(null, '', '#' + id);
   }
 }
+
+// Sayfa yenilenince hash'ten geri yükle
+(function() {
+  const hash = window.location.hash.replace('#', '');
+  if (hash && document.getElementById('page-' + hash)) {
+    showPage(hash);
+  }
+})();
 
 // Mobile menu
 function toggleMobile() {
@@ -850,8 +874,9 @@ function isAdminLoggedIn() { return !!_adminSession; }
 
 function setAdminUI(loggedIn) {
   document.getElementById('admin-bar-galeri').style.display = loggedIn ? 'flex' : 'none';
-  document.getElementById('admin-add-galeri').style.display = loggedIn ? 'flex' : 'none';
-  renderAkademiGallery();
+  document.getElementById('admin-create-album').style.display = loggedIn ? 'flex' : 'none';
+  document.getElementById('admin-add-galeri').style.display = loggedIn && _currentAlbumId ? 'flex' : 'none';
+  renderAlbumGrid();
 }
 
 function openAdminLogin() {
@@ -928,51 +953,113 @@ async function uploadToCloudinary(file, statusElId) {
   }
 }
 
-// ═══ GALERİ (Supabase: akademi_photos) ═══
-let _akademiPhotos = [];
+// ═══ ALBÜM SİSTEMİ ═══
+let _albums = [];
+let _albumPhotos = [];
+let _currentAlbumId = null;
+let _lightboxPhotos = [];
 
-async function loadAkademiGallery() {
+async function loadAlbums() {
   if (!window._sbReady) return;
   try {
-    const { data, error } = await window._sb.from('akademi_photos').select('*').order('created_at', { ascending: false });
-    if (!error && data) _akademiPhotos = data;
+    const { data: albums } = await window._sb.from('akademi_albums').select('*').order('created_at', { ascending: false });
+    if (albums) _albums = albums;
+    const { data: photos } = await window._sb.from('akademi_photos').select('*');
+    if (photos) _albumPhotos = photos;
   } catch(e) { console.warn(e); }
-  renderAkademiGallery();
+  renderAlbumGrid();
 }
 
-function renderAkademiGallery() {
+function renderAlbumGrid() {
+  const grid = document.getElementById('album-grid');
+  const empty = document.getElementById('album-grid-empty');
+  if (!grid) return;
+  if (!_albums.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = _albums.map(a => {
+    const photos = _albumPhotos.filter(p => p.album_id === a.id);
+    const cover = photos[0];
+    return `<div class="album-card" onclick="openAlbum(${a.id})">
+      <div class="album-cover" style="position:relative">
+        ${cover ? `<img src="${cover.url}" loading="lazy" alt="">` : '<div class="album-cover-placeholder">📷</div>'}
+        ${isAdminLoggedIn() ? `<button class="album-del" onclick="event.stopPropagation();deleteAlbum(${a.id})">✕</button>` : ''}
+      </div>
+      <div class="album-info">
+        <div class="album-name">${a.name}</div>
+        <div class="album-count">${photos.length} fotoğraf</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showAlbumList() {
+  document.getElementById('galeri-albums-view').style.display = 'block';
+  document.getElementById('galeri-detail-view').style.display = 'none';
+  _currentAlbumId = null;
+  document.getElementById('admin-add-galeri').style.display = 'none';
+}
+
+function openAlbum(albumId) {
+  _currentAlbumId = albumId;
+  const album = _albums.find(a => a.id === albumId);
+  document.getElementById('detail-album-name').textContent = album ? album.name : '';
+  document.getElementById('galeri-albums-view').style.display = 'none';
+  document.getElementById('galeri-detail-view').style.display = 'block';
+  if (isAdminLoggedIn()) document.getElementById('admin-add-galeri').style.display = 'flex';
+  renderAlbumPhotos();
+}
+
+function renderAlbumPhotos() {
   const grid = document.getElementById('akademi-gallery-grid');
   const empty = document.getElementById('akademi-gallery-empty');
-  if (!grid) return;
-  if (!_akademiPhotos.length) {
-    grid.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
+  const photos = _albumPhotos.filter(p => p.album_id === _currentAlbumId);
+  _lightboxPhotos = photos;
+  if (!photos.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
-  grid.innerHTML = _akademiPhotos.map((p, i) => `
+  grid.innerHTML = photos.map((p, i) => `
     <div class="gallery-thumb" onclick="openLightbox(${i})">
-      <img src="${p.url}" loading="lazy" alt="" onerror="this.closest('.gallery-thumb').classList.add('broken')">
+      <img src="${p.url}" loading="lazy" alt="">
       ${isAdminLoggedIn() ? `<button class="gdel" onclick="event.stopPropagation();deleteAkademiPhoto(${p.id})">✕</button>` : ''}
     </div>`).join('');
 }
 
+async function createAlbum() {
+  const input = document.getElementById('new-album-name');
+  const name = input.value.trim();
+  if (!name) return;
+  try {
+    const { data, error } = await window._sb.from('akademi_albums').insert({ name }).select();
+    if (!error && data) { _albums.unshift(data[0]); input.value = ''; renderAlbumGrid(); }
+  } catch(e) { alert('Hata: ' + e.message); }
+}
+
+async function deleteAlbum(id) {
+  if (!confirm('Albüm ve tüm fotoğrafları silinsin mi?')) return;
+  try {
+    await window._sb.from('akademi_photos').delete().eq('album_id', id);
+    await window._sb.from('akademi_albums').delete().eq('id', id);
+    _albums = _albums.filter(a => a.id !== id);
+    _albumPhotos = _albumPhotos.filter(p => p.album_id !== id);
+    renderAlbumGrid();
+  } catch(e) { alert('Hata: ' + e.message); }
+}
+
 async function addAkademiPhoto(input) {
+  if (!_currentAlbumId) return;
   const files = Array.from(input.files);
   if (!files.length) return;
   const statusEl = document.getElementById('akademi-upload-status');
-
   for (let i = 0; i < files.length; i++) {
     if (statusEl) statusEl.textContent = `⏳ Yükleniyor (${i+1}/${files.length})...`;
     const url = await uploadToCloudinary(files[i], null);
     if (!url) continue;
     try {
-      const { data, error } = await window._sb.from('akademi_photos').insert({ url }).select();
-      if (!error && data) _akademiPhotos.unshift(data[0]);
-      renderAkademiGallery();
-    } catch(e) { console.warn('Kayıt hatası:', e.message); }
+      const { data, error } = await window._sb.from('akademi_photos').insert({ url, album_id: _currentAlbumId }).select();
+      if (!error && data) _albumPhotos.push(data[0]);
+      renderAlbumPhotos();
+      renderAlbumGrid();
+    } catch(e) { console.warn(e); }
   }
-
   if (statusEl) statusEl.textContent = '';
   input.value = '';
 }
@@ -981,27 +1068,27 @@ async function deleteAkademiPhoto(id) {
   if (!confirm('Bu fotoğraf silinsin mi?')) return;
   try {
     await window._sb.from('akademi_photos').delete().eq('id', id);
-    _akademiPhotos = _akademiPhotos.filter(p => p.id !== id);
-    renderAkademiGallery();
+    _albumPhotos = _albumPhotos.filter(p => p.id !== id);
+    renderAlbumPhotos();
+    renderAlbumGrid();
   } catch(e) { alert('Silme hatası: ' + e.message); }
 }
 
-let _lightboxIdx = 0;
+loadAlbums();
 
+// ═══ LİGHTBOX ═══
+let _lightboxIdx = 0;
 function openLightbox(idx) {
   _lightboxIdx = idx;
-  renderLightboxImg();
-  document.getElementById('lightbox').classList.add('open');
-}
-function renderLightboxImg() {
-  const photo = _akademiPhotos[_lightboxIdx];
+  const photo = _lightboxPhotos[idx];
   if (!photo) return;
   document.getElementById('lightbox-img').src = photo.url;
-  document.getElementById('lightbox-counter').textContent = (_lightboxIdx + 1) + ' / ' + _akademiPhotos.length;
+  document.getElementById('lightbox-counter').textContent = (idx + 1) + ' / ' + _lightboxPhotos.length;
+  document.getElementById('lightbox').classList.add('open');
 }
 function lightboxNav(dir) {
-  _lightboxIdx = (_lightboxIdx + dir + _akademiPhotos.length) % _akademiPhotos.length;
-  renderLightboxImg();
+  _lightboxIdx = (_lightboxIdx + dir + _lightboxPhotos.length) % _lightboxPhotos.length;
+  openLightbox(_lightboxIdx);
 }
 function closeLightbox(e) {
   if (e.target.closest('.lightbox-close') || e.target.id === 'lightbox') {
@@ -1014,8 +1101,6 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight') lightboxNav(1);
   if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('open');
 });
-
-loadAkademiGallery();
 </script>
 
 <script>
